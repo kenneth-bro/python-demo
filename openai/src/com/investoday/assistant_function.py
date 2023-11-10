@@ -5,7 +5,7 @@ import requests
 from openai import OpenAI
 
 client = OpenAI()
-client.api_key = "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"
+client.api_key = ""
 
 
 def get_weather(location, unit="摄氏度"):
