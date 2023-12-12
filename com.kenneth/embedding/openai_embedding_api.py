@@ -12,6 +12,10 @@ EMBEDDING_MODELS = {
     }
 }
 
+# 初始化模型
+for key, values in EMBEDDING_MODELS.items():
+    EMBEDDING_MODELS[key]["model"] = SentenceTransformer(values.get("path"))
+
 
 class EncodingFormat(str, Enum):
     FLOAT = "float",
@@ -50,8 +54,12 @@ app = FastAPI()
 class EmbeddingAPI:
 
     @staticmethod
-    def get_embedding(model_path, sentence):
-        model = SentenceTransformer(model_path)
+    def get_embedding(model_path=None, model=None, sentence=None):
+        if sentence is None:
+            return None
+
+        if model is None:
+            model = SentenceTransformer(model_path)
         embeddings = model.encode(sentence, normalize_embeddings=True)
         return embeddings
 
@@ -61,7 +69,7 @@ class EmbeddingAPI:
         if embedding_model.get("path") is None:
             raise Exception(f"{model_name} embedding model not found.")
 
-        embeddings = EmbeddingAPI.get_embedding(model_path=embedding_model.get("path"), sentence=sentence)
+        embeddings = EmbeddingAPI.get_embedding(model=embedding_model.get("model"), sentence=sentence)
         # 格式化成openai的格式
         response = EmbeddingRepose()
         response.model = model_name
