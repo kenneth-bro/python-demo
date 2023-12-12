@@ -91,7 +91,7 @@ class EmbeddingAPI:
         # 构建usage
         return response
 
-    @app.post("/v1/embedding", response_model=EmbeddingRepose)
+    @app.post("/v1/embeddings", response_model=EmbeddingRepose)
     async def get_embedding_at_rest(embedding_request: EmbeddingRequest = Body(...)):
         embedding_api = EmbeddingAPI()
         embeddings_openai = embedding_api.get_embedding_at_openai(embedding_request.model,
