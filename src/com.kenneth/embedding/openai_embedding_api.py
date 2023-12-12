@@ -1,9 +1,14 @@
+import sys
+
+sys.path.append("../exception")
+import json
 from sentence_transformers import SentenceTransformer, util
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, HTTPException
 import uvicorn
 from pydantic import BaseModel
 from typing import List
 from enum import Enum
+from BusinessException import *
 
 EMBEDDING_MODEL_BASE_PATH = "/Users/kenneth/Developer/python/models"
 EMBEDDING_MODELS = {
@@ -66,8 +71,9 @@ class EmbeddingAPI:
     @staticmethod
     def get_embedding_at_openai(model_name, sentence) -> EmbeddingRepose:
         embedding_model = EMBEDDING_MODELS.get(model_name)
-        if embedding_model.get("path") is None:
-            raise Exception(f"{model_name} embedding model not found.")
+        if embedding_model is None:
+            raise HTTPException(status_code=400, detail=BusinessException(code="ModelNotFound",
+                                                                          message=f"{model_name}模型未找到").build())
 
         embeddings = EmbeddingAPI.get_embedding(model=embedding_model.get("model"), sentence=sentence)
         # 格式化成openai的格式
@@ -102,5 +108,4 @@ if __name__ == '__main__':
     #
     # print(embeddings_openai)
 
-    uvicorn.run(app, host="0.0.0.0", port=8080, workers=1)
-
+    uvicorn.run(app, host="0.0.0.0", port=9001, workers=1)
